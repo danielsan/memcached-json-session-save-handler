@@ -3,32 +3,32 @@
 namespace Lboy\Session\SaveHandler;
 
 /**
- * Memcached JSON-formatted session save handler
+ * Memcache JSON-formatted session save handler
  *
  * The default memcache session save handler stores sessions encoded with
  * session_encode, but the encoded session is not simple to parse in other
  * languages. Therefore, this class encodes the session in JSON to make reading
  * the session in other languages simple.
  *
- * Note: This class uses the newer php-memcached extension, not php-memcache!
- * @see http://php.net/manual/en/book.memcached.php
+ * Note: This class uses the newer php-memcache extension, not php-memcache!
+ * @see http://php.net/manual/en/book.memcache.php
  *
  * @author Lee Boynton <lee@lboynton.com>
  */
-class Memcached
+class Memcache
 {
     /**
-     * @var \Memcached
+     * @var \Memcache
      */
-    protected $memcached;
+    protected $memcache;
 
     /**
-     * Create new memcached session save handler
-     * @param \Memcached $memcached
+     * Create new memcache session save handler
+     * @param \Memcache $memcache
      */
-    public function __construct(\Memcached $memcached)
+    public function __construct(\Memcache $memcache)
     {
-        $this->memcached = $memcached;
+        $this->memcache = $memcache;
     }
 
     /**
@@ -49,7 +49,7 @@ class Memcached
      */
     public function destroy($id)
     {
-        return $this->memcached->delete("sessions/{$id}");
+        return $this->memcache->delete("sessions/{$id}");
     }
 
     /**
@@ -60,7 +60,7 @@ class Memcached
      */
     public function gc($maxlifetime)
     {
-        // let memcached handle this with expiration time
+        // let memcache handle this with expiration time
         return true;
     }
 
@@ -87,7 +87,7 @@ class Memcached
      */
     public function read($id)
     {
-        $_SESSION = json_decode($this->memcached->get("sessions/{$id}"), true);
+        $_SESSION = json_decode($this->memcache->get("sessions/{$id}"), true);
 
         if (isset($_SESSION) && !empty($_SESSION) && $_SESSION != null)
         {
@@ -108,7 +108,7 @@ class Memcached
     {
         // note: $data is not used as it has already been serialised by PHP,
         // so we use $_SESSION which is an unserialised version of $data.
-        return $this->memcached->set("sessions/{$id}", json_encode($_SESSION),
+        return $this->memcache->set("sessions/{$id}", json_encode($_SESSION),
             $this->lifetime);
     }
 }
